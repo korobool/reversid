@@ -24,7 +24,7 @@ class ServerClass():
         id = uuid.uuid4()
         reversi = self._conn.reversi
         games = reversi.games
-        games.insert({'game': str(id), 'board': initial_state})
+        games.insert({'game': str(id), 'board': initial_state, 'state': 'in_progress'})
 
         return str(id)
 
@@ -38,8 +38,18 @@ class ServerClass():
         reversi = self._conn.reversi
         games = reversi.games
         game = games.find_one({"game": game_id})
+
+        if game['state'] == 'game_over':
+            return True, 'game_over'
+
         board = Board(game[u'board'])
         board = board.move(r, c, 1)
+        games.update({'_id': game['_id']}, {"$set": {'board': board._internal_state}},
+                     upsert=False)
+
+        if not board.has_moves(2):
+            self.game_over(game_id)
+            return True, 'game_over'
 
         ai = OneLevelAI()
 
@@ -49,9 +59,19 @@ class ServerClass():
         games.update({'_id': game['_id']}, {"$set": {'board': board._internal_state}},
                      upsert=False)
 
-        return True
+        if not board.has_moves(1):
+            self.game_over(game_id)
+            return True, 'game_over'
 
+        return True, 'next_step'
 
-server = SimpleXMLRPCServer(("", 8001))
+    def game_over(self, game_id):
+        reversi = self._conn.reversi
+        games = reversi.games
+        game = games.find_one({"game": game_id})
+        games.update({'_id': game['_id']}, {"$set": {'state': 'game_over'}},
+                     upsert=False)
+
+server = SimpleXMLRPCServer(("", 8006))
 server.register_instance(ServerClass())
 server.serve_forever()
