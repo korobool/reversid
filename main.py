@@ -1,5 +1,5 @@
 from board import Board
-from AI import ReversiAI, OneLevelAI
+from AI import ReversiAI, RandomMoveAI
 
 initial_state = [[0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0],
@@ -12,7 +12,7 @@ initial_state = [[0, 0, 0, 0, 0, 0, 0, 0],
 
 board = Board(initial_state)
 
-ai = OneLevelAI()
+ai = RandomMoveAI()
 current_player = 1
 
 steps = 0

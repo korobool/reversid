@@ -1,7 +1,7 @@
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 from board import Board
-from AI import OneLevelAI
+from AI import RandomMoveAI
 import uuid
 import pymongo
 
@@ -20,11 +20,11 @@ class ServerClass():
         self._conn = pymongo.Connection('localhost', 27017)
         pass
 
-    def start_game(self):
+    def start_game(self, user):
         id = uuid.uuid4()
         reversi = self._conn.reversi
         games = reversi.games
-        games.insert({'game': str(id), 'board': initial_state, 'state': 'in_progress'})
+        games.insert({'game': str(id), 'board': initial_state, 'state': 'in_progress', 'user': user})
 
         return str(id)
 
@@ -51,7 +51,7 @@ class ServerClass():
             self.game_over(game_id)
             return True, 'game_over'
 
-        ai = OneLevelAI()
+        ai = RandomMoveAI()
 
         x, y = ai.get_best_move(board, 2)
         board = board.move(x, y, 2)
