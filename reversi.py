@@ -1,4 +1,5 @@
 from SimpleXMLRPCServer import SimpleXMLRPCServer
+from pprint import pprint
 
 from board import Board
 from AI import RandomMoveAI
@@ -24,7 +25,7 @@ class ServerClass():
         id = uuid.uuid4()
         reversi = self._conn.reversi
         games = reversi.games
-        games.insert({'game': str(id), 'board': initial_state, 'state': 'in_progress', 'user': user})
+        games.insert({'game': str(id), 'board': initial_state, 'state': 'in_progress', 'user': user, 'moves': []})
 
         return str(id)
 
@@ -44,7 +45,7 @@ class ServerClass():
 
         board = Board(game[u'board'])
         board = board.move(r, c, 1)
-        games.update({'_id': game['_id']}, {"$set": {'board': board._internal_state}},
+        games.update({'_id': game['_id']}, {"$set": {'board': board._internal_state}, '$push': {'moves': (r, c, 1)}},
                      upsert=False)
 
         if not board.has_moves(2):
@@ -56,7 +57,7 @@ class ServerClass():
         x, y = ai.get_best_move(board, 2)
         board = board.move(x, y, 2)
 
-        games.update({'_id': game['_id']}, {"$set": {'board': board._internal_state}},
+        games.update({'_id': game['_id']}, {"$set": {'board': board._internal_state}, '$push': {'moves': (x, y, 2)}},
                      upsert=False)
 
         if not board.has_moves(1):
@@ -71,6 +72,7 @@ class ServerClass():
         game = games.find_one({"game": game_id})
         games.update({'_id': game['_id']}, {"$set": {'state': 'game_over'}},
                      upsert=False)
+        pprint(games.find_one({"game": game_id}))
 
 server = SimpleXMLRPCServer(("", 8006))
 server.register_instance(ServerClass())
