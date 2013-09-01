@@ -2,7 +2,7 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 from pprint import pprint
 
 from board import Board
-from AI import RandomMoveAI
+from AI import ReversiSimpleAI
 import uuid
 import pymongo
 
@@ -52,7 +52,7 @@ class ServerClass():
             self.game_over(game_id)
             return True, 'game_over'
 
-        ai = RandomMoveAI()
+        ai = ReversiSimpleAI()
 
         x, y = ai.get_best_move(board, 2)
         board = board.move(x, y, 2)
