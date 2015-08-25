@@ -5,6 +5,7 @@ from board import Board
 from AI import ReversiSimpleAI
 import uuid
 import pymongo
+# from pymongo import MongoClient
 
 initial_state = [[0, 0, 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, 0, 0, 0, 0, 0],
@@ -18,7 +19,7 @@ initial_state = [[0, 0, 0, 0, 0, 0, 0, 0],
 
 class ServerClass():
     def __init__(self):
-        self._conn = pymongo.Connection('localhost', 27017)
+        self._conn = pymongo.MongoClient('localhost', 27017)
         pass
 
     def start_game(self, user):

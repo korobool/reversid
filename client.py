@@ -3,7 +3,7 @@ from xmlrpclib import ServerProxy
 from board import Board
 from AI import ReversiSimpleAI
 
-game_server = ServerProxy("http://ai-labs.org:8006")
+game_server = ServerProxy("http://127.0.0.1:8006")
 game_id = game_server.start_game('vasya@gmail.com')
 
 ai = ReversiSimpleAI()
